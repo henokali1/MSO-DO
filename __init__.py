@@ -1,4 +1,3 @@
-
 from flask import Flask, render_template, redirect, url_for, session, request, logging, json
 from wtforms import Form, StringField, TextAreaField, PasswordField, SelectField, validators
 from passlib.hash import sha256_crypt
@@ -6,6 +5,12 @@ from functools import wraps
 import dbconnector as db
 
 app = Flask(__name__)
+
+
+# Get curret user info
+def current_user():
+    return db.get_user_by_email(session['email'].encode('utf8'))
+
 
 # Register Form Class
 class RegisterForm(Form):
@@ -41,7 +46,8 @@ def register():
         password = sha256_crypt.encrypt(str(form.password.data))
 
         sql = "insert into users(first_name, last_name, airport_id, email, job_title, password, department) VALUES(%s, %s, %s, %s, %s, %s, %s)"
-        data = (first_name, last_name, airport_id, email, job_title, password, department)        
+        data = (first_name, last_name, airport_id, email, job_title, password,
+                department)
 
         db.register_user(sql, data)
         #db.register_user(sql, data)
@@ -54,6 +60,7 @@ def register():
 def hello():
     return render_template('login.html')
 
+
 # User login
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -61,15 +68,11 @@ def login():
         # Get Form Fields
         email = request.form['email']
         password_candidate = request.form['password']
-        # Create cursor
-        cur = mysql.connection.cursor()
-
         # Get user by email
-        result = cur.execute("SELECT * FROM users WHERE email = %s", [email])
+        data = db.get_user_by_email(email)
 
-        if result > 0:
+        if len(data) > 0:
             # Get stored hash
-            data = cur.fetchone()
             password = data['password']
 
             # Compare Passwords
@@ -78,7 +81,6 @@ def login():
                 session['logged_in'] = True
                 session['email'] = email
 
-                flash('You are now logged in', 'success')
                 if current_user()['department'] == 'OTHER':
                     return redirect(url_for('mso_request'))
                 elif (current_user()['job_title'] == 'supervisor') or (
@@ -95,6 +97,19 @@ def login():
             error = 'User not found'
             return render_template('login.html', error=error)
     return render_template('login.html')
+
+
+# Check if user logged in
+def is_logged_in(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if 'logged_in' in session:
+            return f(*args, **kwargs)
+        else:
+            return redirect(url_for('login'))
+
+    return wrap
+
 
 if __name__ == "__main__":
     app.run()
