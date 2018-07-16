@@ -4,8 +4,7 @@ import mysql.connector
 # Get all user info by id.
 # @returns: A dictionary with all(single user according to id) user info
 def get_user_by_id(id):
-    cnx = mysql.connector.connect(
-        user='root', password='@tmsqe!1321', host='127.0.0.1', database='MSO')
+    cnx = mysql.connector.connect(user='root', password='@tmsqe!1321', host='127.0.0.1', database='MSO')
 
     cur = cnx.cursor(dictionary=True)
 
@@ -18,9 +17,7 @@ def get_user_by_id(id):
 
 # Get a single user by email.
 def get_user_by_email(email):
-    cnx = mysql.connector.connect(
-        user='root', password='@tmsqe!1321', host='127.0.0.1', database='MSO')
-    
+    cnx = mysql.connector.connect(user='root', password='@tmsqe!1321', host='127.0.0.1', database='MSO')
 	cur = cnx.cursor(dictionary=True)
 
     cur.execute("SELECT * FROM users WHERE email=" + email)
