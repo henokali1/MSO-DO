@@ -54,9 +54,47 @@ def register():
 def hello():
     return render_template('login.html')
 
-@app.route('/login')
+# User login
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-	return render_template('login.html')
+    if request.method == 'POST':
+        # Get Form Fields
+        email = request.form['email']
+        password_candidate = request.form['password']
+        # Create cursor
+        cur = mysql.connection.cursor()
+
+        # Get user by email
+        result = cur.execute("SELECT * FROM users WHERE email = %s", [email])
+
+        if result > 0:
+            # Get stored hash
+            data = cur.fetchone()
+            password = data['password']
+
+            # Compare Passwords
+            if sha256_crypt.verify(password_candidate, password):
+                # Passed
+                session['logged_in'] = True
+                session['email'] = email
+
+                flash('You are now logged in', 'success')
+                if current_user()['department'] == 'OTHER':
+                    return redirect(url_for('mso_request'))
+                elif (current_user()['job_title'] == 'supervisor') or (
+                        current_user()['job_title'] == 'department_head'):
+                    return redirect(url_for('approve'))
+                else:
+                    return redirect(url_for('all_mso'))
+            else:
+                error = 'Invalid login'
+                return render_template('login.html', error=error)
+            # Close connection
+            cur.close()
+        else:
+            error = 'User not found'
+            return render_template('login.html', error=error)
+    return render_template('login.html')
 
 if __name__ == "__main__":
     app.run()
