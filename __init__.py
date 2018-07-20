@@ -111,5 +111,13 @@ def is_logged_in(f):
     return wrap
 
 
+# Logout
+@app.route('/logout')
+@is_logged_in
+def logout():
+    session.clear()
+    return redirect(url_for('login'))
+
+
 if __name__ == "__main__":
     app.run()
