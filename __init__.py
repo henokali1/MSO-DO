@@ -85,9 +85,9 @@ def login():
                     return redirect(url_for('mso_request'))
                 elif (current_user()['job_title'] == 'supervisor') or (
                         current_user()['job_title'] == 'department_head'):
-                    return redirect(url_for('approve'))
+                    return 'approve.html'
                 else:
-                    return redirect(url_for('all_mso'))
+                    return 'all_mso.html'
             else:
                 error = 'Invalid login'
                 return render_template('login.html', error=error)
