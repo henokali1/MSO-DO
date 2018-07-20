@@ -57,8 +57,8 @@ def register():
 
 
 @app.route("/")
-def hello():
-    return render_template('login.html')
+def home():
+    return redirect(url_for('login'))
 
 
 # User login
