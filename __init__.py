@@ -87,7 +87,7 @@ def login():
                         current_user()['job_title'] == 'department_head'):
                     return 'approve.html'
                 else:
-                    return current_user()
+                    return str(current_user())
             else:
                 error = 'Invalid login'
                 return render_template('login.html', error=error)
