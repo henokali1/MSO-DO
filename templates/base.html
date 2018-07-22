@@ -29,7 +29,8 @@
                     <a href="/" data-activates="mobile-demo" class="button-collapse show-on-large">
                         <i class="material-icons">menu</i>
                     </a>
-                    <ul class="right">
+                    {% if session.logged_in %}
+                    <ul class="right hide-on-med-and-down">
                     	{% if session.logged_in and current_user['department'] == 'OTHER'%}
                     	<li>
                             <a href="/mso_request">New MSO Request</a>
@@ -40,7 +41,7 @@
                         <li>
                             <a href="/logout">Logout</a>
                         </li>
-                        {% elif session.logged_in and ((current_user['job_title'] == 'department_head' and current_user['department'] == 'COMNAV') or current_user['job_title'] == 'supervisor') %}
+                        {% elif ((current_user['job_title'] == 'department_head' and current_user['department'] == 'COMNAV') or current_user['job_title'] == 'supervisor') %}
                         <li>
                             <a href="/new_mso">New MSO</a>
                         </li>
@@ -53,7 +54,7 @@
                         <li>
                             <a href="/logout">Logout</a>
                         </li>
-                        {% elif session.logged_in and current_user['job_title'] == 'technician' %}
+                        {% elif current_user['job_title'] == 'technician' %}
                         <li>
                             <a href="/new_mso">New MSO</a>
                         </li>
@@ -69,6 +70,7 @@
                         </li>
                         {% endif %}
                     </ul>
+                    {% endif %}
                 </div>
             </nav>
         </div>
@@ -92,7 +94,7 @@
                         </a>
                     </div>
                 </li>
-                		{% if session.logged_in and current_user['department'] == 'OTHER'%}
+                		{% if current_user['department'] == 'OTHER'%}
                     	<li>
                             <a href="/mso_request">New MSO Request</a>
                         </li>
@@ -102,7 +104,7 @@
                         <li>
                             <a href="/logout">Logout</a>
                         </li>
-                        {% elif session.logged_in and ((current_user['job_title'] == 'department_head' and current_user['department'] == 'COMNAV') or current_user['job_title'] == 'supervisor') %}
+                        {% elif ((current_user['job_title'] == 'department_head' and current_user['department'] == 'COMNAV') or current_user['job_title'] == 'supervisor') %}
                         <li>
                             <a href="/new_mso">New MSO</a>
                         </li>
@@ -115,7 +117,7 @@
                         <li>
                             <a href="/logout">Logout</a>
                         </li>
-                        {% elif session.logged_in and current_user['job_title'] == 'technician' %}
+                        {% elif current_user['job_title'] == 'technician' %}
                         <li>
                             <a href="/new_mso">New MSO</a>
                         </li>
