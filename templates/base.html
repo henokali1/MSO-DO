@@ -30,15 +30,32 @@
                         <i class="material-icons">menu</i>
                     </a>
                     <ul class="right">
-                        {% if session.logged_in %}
+                    	{% if session.logged_in and current_user['department'] == 'OTHER'%}
+                    	<li>
+                            <a href="/mso_request">New MSO Request</a>
+                        </li>
+                        <li>
+                            <a href="/mso_requests">MSO Requests</a>
+                        </li>
+                        <li>
+                            <a href="/logout">Logout</a>
+                        </li>
+                        {% elif session.logged_in and ((current_user['job_title'] == 'department_head' and current_user['department'] == 'COMNAV') or current_user['job_title'] == 'supervisor') %}
                         <li>
                             <a href="/new_mso">New MSO</a>
                         </li>
                         <li>
-                            <a href="/mso_request">MSO Request</a>
+                            <a href="/approve">Approve MSO's</a>
                         </li>
                         <li>
-                            <a href="/approve">Approve MSO's</a>
+                            <a href="/all_mso">All MSO's</a>
+                        </li>
+                        <li>
+                            <a href="/logout">Logout</a>
+                        </li>
+                        {% elif session.logged_in and current_user['job_title'] == 'technician' %}
+                        <li>
+                            <a href="/new_mso">New MSO</a>
                         </li>
                         <li>
                             <a href="/all_mso">All MSO's</a>
@@ -75,26 +92,45 @@
                         </a>
                     </div>
                 </li>
-                <li>
-                    <a href="/new_mso">New MSO</a>
-                </li>
-                <li>
-                    <a href="/mso_request">MSO Request</a>
-                </li>
-                <li>
-                    <a href="/approve">Approve MSO's</a>
-                </li>
-                <li>
-                    <a href="/all_mso">All MSO's</a>
-                </li>
-                <li>
-                    <a href="/logout">Logout</a>
-                </li>
-                {% else %}
-                <li>
-                    <a href="/register">Register</a>
-                </li>
-                {% endif %}
+                		{% if session.logged_in and current_user['department'] == 'OTHER'%}
+                    	<li>
+                            <a href="/mso_request">New MSO Request</a>
+                        </li>
+                        <li>
+                            <a href="/mso_requests">MSO Requests</a>
+                        </li>
+                        <li>
+                            <a href="/logout">Logout</a>
+                        </li>
+                        {% elif session.logged_in and ((current_user['job_title'] == 'department_head' and current_user['department'] == 'COMNAV') or current_user['job_title'] == 'supervisor') %}
+                        <li>
+                            <a href="/new_mso">New MSO</a>
+                        </li>
+                        <li>
+                            <a href="/approve">Approve MSO's</a>
+                        </li>
+                        <li>
+                            <a href="/all_mso">All MSO's</a>
+                        </li>
+                        <li>
+                            <a href="/logout">Logout</a>
+                        </li>
+                        {% elif session.logged_in and current_user['job_title'] == 'technician' %}
+                        <li>
+                            <a href="/new_mso">New MSO</a>
+                        </li>
+                        <li>
+                            <a href="/all_mso">All MSO's</a>
+                        </li>
+                        <li>
+                            <a href="/logout">Logout</a>
+                        </li>
+                        {% else %}
+                        <li>
+                            <a href="/register">Register</a>
+                        </li>
+                        {% endif %}
+                        {% endif %}
                 <li>
                     <div class="divider"></div>
                 </li>

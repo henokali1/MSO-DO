@@ -3,9 +3,18 @@ from wtforms import Form, StringField, TextAreaField, PasswordField, SelectField
 from passlib.hash import sha256_crypt
 from functools import wraps
 import dbconnector as db
+import helper as hlp
+
+# Authorizations
+new_auth = ['department_head', 'supervisor', 'technician']
+all_mso_auth = ['department_head', 'supervisor', 'technician']
+mso_auth = ['department_head', 'supervisor', 'technician']
+approve_auth = ['department_head', 'supervisor']
+approve_mso_auth = ['department_head', 'supervisor']
+edit_mso_auth = ['department_head', 'supervisor', 'technician', 'OTHER']
+mso_request_auth = ['OTHER']
 
 app = Flask(__name__)
-
 
 # Get curret user info
 def current_user():
@@ -49,7 +58,7 @@ def register():
         data = (first_name, last_name, airport_id, email, job_title, password,
                 department)
 
-        db.register_user(sql, data)
+        db.save(sql, data)
         #db.register_user(sql, data)
 
         return redirect(url_for('login'))
@@ -69,12 +78,9 @@ def login():
         email = request.form['email']
         password_candidate = request.form['password']
         # Get user by email
-        data = db.get_user_by_email(email)
+        password = db.user_psw(email)
 
-        if len(data) > 0:
-            # Get stored hash
-            password = data['password']
-
+        if len(password) > 0:
             # Compare Passwords
             if sha256_crypt.verify(password_candidate, password):
                 # Passed
@@ -83,11 +89,10 @@ def login():
 
                 if current_user()['department'] == 'OTHER':
                     return redirect(url_for('mso_request'))
-                elif (current_user()['job_title'] == 'supervisor') or (
-                        current_user()['job_title'] == 'department_head'):
-                    return 'approve.html'
+                elif ((current_user()['job_title'] == 'supervisor') or (current_user()['job_title'] == 'department_head')) and current_user()['department'] == 'COMNAV':
+                    return redirect(url_for('approve'))
                 else:
-                    return str(current_user())
+                    return redirect(url_for('all_mso'))
             else:
                 error = 'Invalid login'
                 return render_template('login.html', error=error)
@@ -98,7 +103,6 @@ def login():
             return render_template('login.html', error=error)
     return render_template('login.html')
 
-
 # Check if user logged in
 def is_logged_in(f):
     @wraps(f)
@@ -107,7 +111,6 @@ def is_logged_in(f):
             return f(*args, **kwargs)
         else:
             return redirect(url_for('login'))
-
     return wrap
 
 
@@ -117,6 +120,237 @@ def is_logged_in(f):
 def logout():
     session.clear()
     return redirect(url_for('login'))
+
+# MSO's
+@app.route('/all_mso')
+@is_logged_in
+def all_mso():
+    if (current_user()['job_title'] in all_mso_auth) and (current_user()['department'] == 'COMNAV'):
+
+        # Get MSO's
+        msos = db.get_all_msos()
+
+        if len(msos) > 0:
+            return render_template('all_mso.html', msos=msos, current_user=current_user())
+        else:
+            msg = 'No MSO\'s Found'
+            return render_template('all_mso.html', msg=msg, current_user=current_user())
+        # Close db connection
+    else:
+        return render_template('not_authorized.html')
+
+# New MSO
+@app.route('/new_mso', methods=['GET', 'POST'])
+@is_logged_in
+def new():
+    if (current_user()['job_title'] in new_auth) and (current_user()['department'] == 'COMNAV') and (request.method == 'POST'):
+        requested_by = request.form.get('requested_by')
+        section = request.form.get('section')
+        department_head = request.form.get('department_head')
+        location = request.form.get('location')
+        description_of_service = request.form.get('description_of_service')
+        actual_work_description = request.form.get('actual_work_description')
+        date_started = request.form.get('date_started')
+        date_completed = request.form.get('date_completed')
+        work_completed_by = request.form.getlist('work_completed_by')
+        work_completed_by = [x.encode('utf-8') for x in work_completed_by]
+        work_completed_by = ','.join(str(e) for e in work_completed_by)
+
+        user_id = current_user()['id']
+
+        posted_by = current_user()['first_name'] + ' ' + current_user()['last_name']
+
+        # Execute
+        sql = "INSERT INTO tsd_mso_form(id_number, posted_by, requested_by, section, department_head, location, description_of_service, actual_work_descripition, date_started, date_compleated, work_compleated_by) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
+        data = (user_id, posted_by, requested_by, section, department_head, location, description_of_service, actual_work_description, date_started, date_completed, work_completed_by)
+
+        # Save into db
+        db.save(sql, data)
+
+        return redirect(url_for('all_mso'))
+    elif request.method == 'GET' and (current_user()['job_title'] in new_auth) and (current_user()['department'] == 'COMNAV'):
+        technicians = db.get_technicians()
+        return render_template('new_mso.html', technicians=technicians, current_user=current_user())
+    else:
+        return render_template('not_authorized.html', current_user=current_user())
+
+# Edit MSO
+@app.route('/mso/edit/<string:id>', methods=['GET', 'POST'])
+@is_logged_in
+def edit_mso(id):
+    # Get the MSO to be edited
+    mso = db.get_mso(id)
+    # Get who posted this MSO
+    posted_by = mso['posted_by']
+
+    if hlp.can_edit(id):
+        msg = 'This MSO has been approved by both TSM and TSS. You can\'t edit this MSO anymore.'
+        return render_template('not_authorized.html', msg=msg, mso=mso, current_user=current_user())
+
+    # Check who made this request
+    elif mso['requested_by_other_department']:
+        if request.method == 'POST':
+            section = request.form.get('section')
+            actual_work_description = request.form.get('actual_work_description')
+
+            date_started = request.form.get('date_started')
+            date_completed = request.form.get('date_completed')
+            work_completed_by = request.form.getlist('work_completed_by')
+            work_completed_by = [x.encode('utf-8') for x in work_completed_by]
+            work_completed_by = ','.join(str(e) for e in work_completed_by)
+
+            # Update the MSO in the database
+            sql = "UPDATE tsd_mso_form  SET work_compleated_by=%s, date_compleated=%s, date_started=%s, actual_work_descripition=%s, section=%s WHERE id=%s"
+            data = (work_completed_by, date_completed, date_started, actual_work_description, section, id)
+            db.update_mso(sql, data)
+
+            return redirect(url_for('all_mso'))
+
+        # Get MSO
+        mso = db.get_mso(id)
+        # Get technicians
+        technicians = db.get_technicians()
+        
+        mso['work_compleated_by'] = ''
+        return render_template('edit_mso.html', mso=mso, technicians=technicians, current_user=current_user())
+
+    elif posted_by == current_user()['first_name'] + ' ' + current_user()['last_name']:
+        if request.method == 'POST':
+            requested_by = request.form.get('requested_by')
+            section = request.form.get('section')
+            department_head = request.form.get('department_head')
+            location = request.form.get('location')
+            description_of_service = request.form.get('description_of_service')
+            actual_work_description = request.form.get('actual_work_description')
+            date_started = request.form.get('date_started')
+            date_completed = request.form.get('date_completed')
+            work_completed_by = request.form.getlist('work_completed_by')
+            work_completed_by = [x.encode('utf-8') for x in work_completed_by]
+            work_completed_by = ','.join(str(e) for e in work_completed_by)
+
+            # Update the MSO in the database
+            sql = "UPDATE tsd_mso_form  SET work_compleated_by=%s, date_compleated=%s, date_started=%s, actual_work_descripition=%s, description_of_service=%s, location=%s, department_head=%s, requested_by=%s, section=%s WHERE id=%s"
+            data = (work_completed_by, date_completed, date_started, actual_work_description, description_of_service, location, department_head, requested_by, section, id) 
+
+            db.update_mso(sql, data)
+
+            return redirect(url_for('all_mso'))
+
+        else:
+            return render_template('edit_mso.html', mso=mso, technicians=db.get_technicians(), current_user=current_user())
+
+    else:
+        msg = 'Only ' + posted_by.capitalize() + ' can edit this MSO.'
+        return render_template('not_authorized.html', msg=msg, mso=mso, current_user=current_user())
+
+# Delete MSO
+@app.route('/mso/delete/<string:id>', methods=['GET', 'POST'])
+@is_logged_in
+def delete_mso(id):
+    # Check if MSO can be deleted
+    # if hlp.can_delete(id=id, session=session):
+    #     msg = 'This MSO has been approved by both TSM and TSS. You can\'t delete this MSO anymore.'
+    #     return render_template('not_authorized.html', msg=msg, mso=mso, current_user=current_user())
+
+    # Check if current user is authorized to delete given MSO
+    # elif str(current_user()['id']) == id_number.encode('utf8'):
+    #     if db.delete_mso(id):
+    #         print('mso deleted succsseufully')
+    #     else:
+    #         print('couldnt delete')
+    #     return redirect(url_for('all_mso'))
+    # else:
+    #     msg = 'Only ' + posted_by.capitalize() + ' can delete this MSO.'
+    #     return render_template('not_authorized.html', msg=msg)
+    # return redirect(url_for('all_mso'))
+    print(str(current_user()['id']) == id_number.encode('utf8'))
+    print(str(current_user()['id']), id_number.encode('utf8'))
+    return 'd'
+
+# Single MSO
+@app.route('/mso/<string:id>/')
+@is_logged_in
+def mso(id):
+    if (current_user()['job_title'] in mso_auth) and (current_user()['department'] == 'COMNAV'):
+        mso = db.get_mso(id)
+
+        return render_template('mso.html', mso=mso, current_user=current_user())
+    else:
+        return render_template('not_authorized.html')
+
+# MSO Request
+@app.route('/mso_request', methods=['GET', 'POST'])
+@is_logged_in
+def mso_request():
+    if request.method == 'POST':
+        requested_by = request.form.get('requested_by')
+        department_head = request.form.get('department_head')
+        location = request.form.get('location')
+        description_of_service = request.form.get('description_of_service')
+
+        # Get current user
+        user = current_user()['first_name'] + ' ' + current_user()['last_name']
+
+        sql = "INSERT INTO tsd_mso_form(posted_by, requested_by, department_head, location, description_of_service, requested_by_other_department) VALUES(%s, %s, %s, %s, %s, %s)"
+        data = (user, requested_by, department_head, location, description_of_service, 1)
+
+        # Save into db
+        db.save(sql, data)
+
+        return redirect(url_for('mso_request'))
+
+    return render_template('mso_request.html', current_user=current_user())
+
+
+# Approve MSO
+@app.route('/approve')
+@is_logged_in
+def approve():
+    if (current_user()['job_title'] == 'department_head' and current_user()['department'] == 'COMNAV'):
+        msos = db.get_tsm_approval_msos()
+
+        if len(msos) > 0:
+            return render_template('approve.html', msos=msos, current_user=current_user())
+        else:
+            msg = 'No Pending MSO\'s for Approval.'
+            return render_template('all_mso.html', msg=msg, current_user=current_user())
+
+    elif (current_user()['job_title'] == 'supervisor' and current_user()['department'] == 'COMNAV'):
+        msos = db.get_tss_approval_msos()
+
+        if len(msos) > 0:
+            return render_template('approve.html', msos=msos, current_user=current_user())
+        else:
+            msg = 'No Pending MSO\'s for Approval.'
+            return render_template('all_mso.html', msg=msg, current_user=current_user())
+    else:
+        msg = 'Only TSM or TSS can approve MSO\'s'
+        return render_template('not_authorized.html', msg=msg, current_user=current_user())
+
+
+# Approve MSO through AJAX request.
+@app.route('/approve_mso/<string:id>')
+@is_logged_in
+def approve_mso(id):
+    id = id.replace('MSO-', '')
+    if (current_user()['job_title'] == 'department_head'):
+        # Update the MSO in the database
+        sql = "UPDATE tsd_mso_form  SET tsm_approval=%s, tsm_approval_date=CURRENT_TIMESTAMP WHERE id=%s"
+        data = (1, id)
+        db.update_mso(sql, data)
+
+        return 'nothing'
+    elif (current_user()['job_title'] == 'supervisor'):
+        # Update the MSO in the database
+        sql = "UPDATE tsd_mso_form  SET supervisor_approval=%s, supervisor_approval_date=CURRENT_TIMESTAMP WHERE id=%s"
+        data = (1, id)
+        db.update_mso(sql, data)
+
+        return 'nothing'
+
+    else:
+        pass
+
 
 
 if __name__ == "__main__":
