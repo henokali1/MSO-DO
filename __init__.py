@@ -351,6 +351,26 @@ def approve_mso(id):
     else:
         pass
 
+# MSO's by the given user
+@app.route('/my_msos')
+@is_logged_in
+def my_msos():
+    user_info = current_user()
+    user = user_info['first_name'] + ' ' + user_info['last_name']
+    # Get MSO's
+    msos = db.all_msos_by_user(user)
+
+    if len(msos) > 0:
+        return render_template('my_msos.html', msos=msos, current_user=user_info)
+    else:
+        msg = 'No MSO\'s Found'
+        return render_template('my_msos.html', msg=msg, current_user=user_info)
+
+# MSO's requested by other departments and the given user
+@app.route('/mso_requests')
+@is_logged_in
+def mso_requests():
+    return 'mso requests'
 
 
 if __name__ == "__main__":

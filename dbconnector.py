@@ -1,5 +1,5 @@
 import mysql.connector
-
+from mysql.connector import Error
 
 # Get all user info by id.
 # @returns: A dictionary with all(single user according to id) user info
@@ -119,15 +119,34 @@ def get_tss_approval_msos():
 
 # Delete MSO
 def delete_mso(id):
+    query = "DELETE FROM tsd_mso_form WHERE id = %s"
+    # connect to the database server
+    cnx = mysql.connector.connect(user='root', password='@tmsqe!1321', host='127.0.0.1', database='MSO')
+    cur = cnx.cursor()
+ 
     try:
-        cnx = mysql.connector.connect(user='root', password='@tmsqe!1321', host='127.0.0.1', database='MSO')
-        cur = cnx.cursor(dictionary=True)
-        sql = "DELETE FROM `maillist_subscription` WHERE id = ?"
-        cur.execute(sql, (id,))
+        # execute the query
+        cur.execute(query, (id,))
+ 
+        # accept the change
         cnx.commit()
+        print(str(id) + ' Deleted')
+    except Error as error:
+        print(error)
+ 
+    finally:
         cur.close()
         cnx.close()
-        return 1
-    except:
-        return 0
-#print(tsm_tss_approved())
+
+# Returns MSO's by the given email
+def all_msos_by_user(user):
+    cnx = mysql.connector.connect(user='root', password='@tmsqe!1321', host='127.0.0.1', database='MSO')
+    cur = cnx.cursor(dictionary=True)
+    query = "SELECT * FROM tsd_mso_form WHERE posted_by=%s"
+    cur.execute(query, (user,))
+    r = cur.fetchall()
+    cur.close()
+    cnx.close()
+    return r
+
+print(delete_mso(6))

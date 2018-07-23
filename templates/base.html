@@ -36,7 +36,7 @@
                             <a href="/mso_request">New MSO Request</a>
                         </li>
                         <li>
-                            <a href="/mso_requests">MSO Requests</a>
+                            <a href="/my_msos">MSO Requests</a>
                         </li>
                         <li>
                             <a href="/logout">Logout</a>
@@ -52,6 +52,9 @@
                             <a href="/all_mso">All MSO's</a>
                         </li>
                         <li>
+                            <a href="/my_msos">MSO Requests</a>
+                        </li>
+                        <li>
                             <a href="/logout">Logout</a>
                         </li>
                         {% elif current_user['job_title'] == 'technician' %}
@@ -60,6 +63,9 @@
                         </li>
                         <li>
                             <a href="/all_mso">All MSO's</a>
+                        </li>
+                        <li>
+                            <a href="/my_msos">My MSO's</a>
                         </li>
                         <li>
                             <a href="/logout">Logout</a>
@@ -99,7 +105,7 @@
                             <a href="/mso_request">New MSO Request</a>
                         </li>
                         <li>
-                            <a href="/mso_requests">MSO Requests</a>
+                            <a href="/my_msos">MSO Requests</a>
                         </li>
                         <li>
                             <a href="/logout">Logout</a>
@@ -115,6 +121,9 @@
                             <a href="/all_mso">All MSO's</a>
                         </li>
                         <li>
+                            <a href="/my_msos">MSO Requests</a>
+                        </li>
+                        <li>
                             <a href="/logout">Logout</a>
                         </li>
                         {% elif current_user['job_title'] == 'technician' %}
@@ -123,6 +132,9 @@
                         </li>
                         <li>
                             <a href="/all_mso">All MSO's</a>
+                        </li>
+                        <li>
+                            <a href="/my_msos">My MSO's</a>
                         </li>
                         <li>
                             <a href="/logout">Logout</a>
@@ -157,5 +169,6 @@
     <!-- CK Editor CDN -->
     <script src="https://cdn.ckeditor.com/4.8.0/standard/ckeditor.js"></script>
 </body>
-
+<!-- MOVES CONTENT UP -->
+<div style="margin-top: 500px;"></div>
 </html>
