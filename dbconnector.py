@@ -142,11 +142,11 @@ def delete_mso(id):
 def all_msos_by_user(user):
     cnx = mysql.connector.connect(user='root', password='@tmsqe!1321', host='127.0.0.1', database='MSO')
     cur = cnx.cursor(dictionary=True)
-    query = "SELECT * FROM tsd_mso_form WHERE posted_by=%s"
+    query = "SELECT * FROM tsd_mso_form WHERE posted_by=%s ORDER BY id DESC"
     cur.execute(query, (user,))
     r = cur.fetchall()
     cur.close()
     cnx.close()
     return r
 
-print(delete_mso(6))
+#print(delete_mso(7))

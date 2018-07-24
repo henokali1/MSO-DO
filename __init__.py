@@ -188,6 +188,22 @@ def edit_mso(id):
         return render_template('not_authorized.html', msg=msg, mso=mso, current_user=current_user())
 
     # Check who made this request
+    elif mso['requested_by_other_department'] and posted_by == current_user()['first_name'] + ' ' + current_user()['last_name']:
+        if request.method == 'POST':
+            requested_by = request.form.get('requested_by')
+            department_head = request.form.get('department_head')
+            location = request.form.get('location')
+            description_of_service = request.form.get('description_of_service')
+
+            # Update the MSO in the database
+            sql = "UPDATE tsd_mso_form  SET description_of_service=%s, location=%s, department_head=%s, requested_by=%s WHERE id=%s"
+            data = (description_of_service, location, department_head, requested_by, id) 
+
+            db.update_mso(sql, data)
+
+            return redirect(url_for('my_msos'))
+        return render_template('edit_mso_oth.html', mso=mso, current_user=current_user())
+    # Check who made this request
     elif mso['requested_by_other_department']:
         if request.method == 'POST':
             section = request.form.get('section')
@@ -200,8 +216,8 @@ def edit_mso(id):
             work_completed_by = ','.join(str(e) for e in work_completed_by)
 
             # Update the MSO in the database
-            sql = "UPDATE tsd_mso_form  SET work_compleated_by=%s, date_compleated=%s, date_started=%s, actual_work_descripition=%s, section=%s WHERE id=%s"
-            data = (work_completed_by, date_completed, date_started, actual_work_description, section, id)
+            sql = "UPDATE tsd_mso_form  SET completed=%s, work_compleated_by=%s, date_compleated=%s, date_started=%s, actual_work_descripition=%s, section=%s WHERE id=%s"
+            data = (1, work_completed_by, date_completed, date_started, actual_work_description, section, id)
             db.update_mso(sql, data)
 
             return redirect(url_for('all_mso'))
