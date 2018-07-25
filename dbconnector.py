@@ -130,7 +130,6 @@ def delete_mso(id):
  
         # accept the change
         cnx.commit()
-        print(str(id) + ' Deleted')
     except Error as error:
         print(error)
  

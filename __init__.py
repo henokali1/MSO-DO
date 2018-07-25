@@ -34,6 +34,9 @@ class RegisterForm(Form):
     department = SelectField(
         u'Department',
         choices=[('', ''), ('COMNAV', 'COMNAV'), ('OTHER', 'OTHER')])
+    sex = SelectField(
+        u'Sex',
+        choices=[('', ''), ('M', 'MALE'), ('F', 'FEMALE')])
     password = PasswordField('Password', [
         validators.DataRequired(),
         validators.EqualTo('confirm', message='Passwords do not match')
@@ -48,18 +51,18 @@ def register():
     if request.method == 'POST' and form.validate():
         first_name = form.first_name.data
         last_name = form.last_name.data
+        sex = form.sex.data
         airport_id = form.airport_id.data
         email = form.email.data
         job_title = form.job_title.data
         department = form.department.data
         password = sha256_crypt.encrypt(str(form.password.data))
 
-        sql = "insert into users(first_name, last_name, airport_id, email, job_title, password, department) VALUES(%s, %s, %s, %s, %s, %s, %s)"
-        data = (first_name, last_name, airport_id, email, job_title, password,
+        sql = "insert into users(first_name, last_name, sex, airport_id, email, job_title, password, department) VALUES(%s, %s, %s, %s, %s, %s, %s, %s)"
+        data = (first_name, last_name, sex, airport_id, email, job_title, password,
                 department)
 
         db.save(sql, data)
-        #db.register_user(sql, data)
 
         return redirect(url_for('login'))
     return render_template('register.html', form=form)
@@ -263,25 +266,11 @@ def edit_mso(id):
 @app.route('/mso/delete/<string:id>', methods=['GET', 'POST'])
 @is_logged_in
 def delete_mso(id):
-    # Check if MSO can be deleted
-    # if hlp.can_delete(id=id, session=session):
-    #     msg = 'This MSO has been approved by both TSM and TSS. You can\'t delete this MSO anymore.'
-    #     return render_template('not_authorized.html', msg=msg, mso=mso, current_user=current_user())
+    if hlp.can_delete(id, session):
+        db.delete_mso(id)
+        return redirect(url_for('my_msos'))
+	return redirect(url_for('my_msos'))
 
-    # Check if current user is authorized to delete given MSO
-    # elif str(current_user()['id']) == id_number.encode('utf8'):
-    #     if db.delete_mso(id):
-    #         print('mso deleted succsseufully')
-    #     else:
-    #         print('couldnt delete')
-    #     return redirect(url_for('all_mso'))
-    # else:
-    #     msg = 'Only ' + posted_by.capitalize() + ' can delete this MSO.'
-    #     return render_template('not_authorized.html', msg=msg)
-    # return redirect(url_for('all_mso'))
-    print(str(current_user()['id']) == id_number.encode('utf8'))
-    print(str(current_user()['id']), id_number.encode('utf8'))
-    return 'd'
 
 # Single MSO
 @app.route('/mso/<string:id>/')
@@ -313,7 +302,7 @@ def mso_request():
         # Save into db
         db.save(sql, data)
 
-        return redirect(url_for('mso_request'))
+        return redirect(url_for('my_msos'))
 
     return render_template('mso_request.html', current_user=current_user())
 

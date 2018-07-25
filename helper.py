@@ -9,4 +9,5 @@ def can_edit(id):
 def can_delete(id, session):
 	user_info = db.get_user_by_email(session['email'])
 	current_user = user_info['first_name'] + ' ' + user_info['last_name']
-	return(current_user == db.get_mso(id)['posted_by'])
+	approval = (db.get_mso(id)['tsm_approval']) == None and (db.get_mso(id)['supervisor_approval'] == None)
+	return((current_user == db.get_mso(id)['posted_by']) and approval)

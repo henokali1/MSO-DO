@@ -23,7 +23,7 @@
             <a href="#" class="waves-effect waves-light green disabled btn modal-trigger">MSO Completed</a>
             {% elif current_user['first_name'] + ' ' + current_user['last_name'] == mso.posted_by and (mso.tsm_approval == None and mso.supervisor_approval == None) %}
             <a id="read_mode_a" href="/mso/edit/{{mso.id}}" class="waves-effect waves-light green btn modal-trigger">Edit</a>
-            <a id="read_mode_a" href="/mso/delete/{{mso.id}}" class="waves-effect waves-light red btn modal-trigger">Delete</a>
+            <a id="{{mso.id}}" href="/mso/delete/{{mso.id}}" class="waves-effect waves-light red btn modal-trigger">DISCARD</a>
             {% elif mso.requested_by_other_department == 1 and current_user['department'] == 'COMNAV' %} {% if (mso.tsm_approval == 1 or mso.supervisor_approval == 1) %}
             <a href="/mso/edit/{{mso.id}}" class="waves-effect waves-light green btn modal-trigger">Complete MSO</a>
             {% else %}
