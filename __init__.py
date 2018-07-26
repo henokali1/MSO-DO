@@ -104,7 +104,15 @@ def login():
         else:
             error = 'User not found'
             return render_template('login.html', error=error)
-    return render_template('login.html')
+    try:
+        if current_user()['department'] == 'OTHER':
+            return redirect(url_for('mso_request'))
+        elif ((current_user()['job_title'] == 'supervisor') or (current_user()['job_title'] == 'department_head')) and current_user()['department'] == 'COMNAV':
+            return redirect(url_for('approve'))
+        else:
+            return redirect(url_for('all_mso'))
+    except:
+        return render_template('login.html')
 
 # Check if user logged in
 def is_logged_in(f):
