@@ -270,14 +270,14 @@ def edit_mso(id):
         msg = 'Only ' + posted_by.capitalize() + ' can edit this MSO.'
         return render_template('not_authorized.html', msg=msg, mso=mso, current_user=current_user())
 
-# Delete MSO
+# Delete MSO through AJAX request
 @app.route('/mso/delete/<string:id>', methods=['GET', 'POST'])
 @is_logged_in
 def delete_mso(id):
     if hlp.can_delete(id, session):
         db.delete_mso(id)
-        return redirect(url_for('my_msos'))
-	return redirect(url_for('my_msos'))
+        return 'nothing'
+	return 'nothing'
 
 
 # Single MSO

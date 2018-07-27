@@ -2,7 +2,7 @@
 <div class="container">
     <h5>{{msg}}</h5>
     {%for mso in msos %}
-    <div class="row mso_row" id="r{{i}}">
+    <div class="row mso_row" id="r{{mso.id}}">
         <div class="col s12">
             <br>
             <a id="read_mode_a" href="/mso/{{mso.id}}">
@@ -20,8 +20,8 @@
                 </div>
                 {{mso.can_edit}}</a>
             {% if current_user['first_name'] + ' ' + current_user['last_name'] == mso.posted_by and (mso.requested_by_other_department == None ) and (mso.tsm_approval == None and mso.supervisor_approval == None) %}
-            <a id="read_mode_a" href="/mso/edit/{{mso.id}}" class="waves-effect waves-light green btn modal-trigger">Edit</a>
-            <a id="read_mode_a" href="/mso/delete/{{mso.id}}" class="waves-effect waves-light red btn modal-trigger">Delete</a>
+            <a id="" href="/mso/edit/{{mso.id}}" class="waves-effect waves-light green btn modal-trigger">Edit</a>
+            <a id="{{mso.id}}" href="#" class="delete waves-effect waves-light red btn modal-trigger">Delete</a>
             {% elif mso.requested_by_other_department == 1 %}
             
             {% if mso.completed or (mso.tsm_approval == 1 and mso.supervisor_approval == 1) %}
