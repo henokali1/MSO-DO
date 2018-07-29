@@ -20,7 +20,24 @@ app = Flask(__name__)
 def current_user():
     return db.get_user_by_email(session['email'].encode('utf8'))
 
+# Check if user logged in
+def is_logged_in(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if 'logged_in' in session:
+            return f(*args, **kwargs)
+        else:
+            return redirect(url_for('login'))
+    return wrap
 
+
+# Logout
+@app.route('/logout')
+@is_logged_in
+def logout():
+    session.clear()
+    return redirect(url_for('login'))
+    
 # Register Form Class
 class RegisterForm(Form):
     first_name = StringField('First Name', [validators.Length(min=1, max=50)])
@@ -46,6 +63,7 @@ class RegisterForm(Form):
 
 # User Register
 @app.route('/register', methods=['GET', 'POST'])
+@is_logged_in
 def register():
     form = RegisterForm(request.form)
     if request.method == 'POST' and form.validate():
@@ -65,7 +83,7 @@ def register():
         db.save(sql, data)
 
         return redirect(url_for('login'))
-    return render_template('register.html', form=form)
+    return render_template('register.html', form=form, current_user=current_user())
 
 
 @app.route("/")
@@ -114,23 +132,7 @@ def login():
     except:
         return render_template('login.html')
 
-# Check if user logged in
-def is_logged_in(f):
-    @wraps(f)
-    def wrap(*args, **kwargs):
-        if 'logged_in' in session:
-            return f(*args, **kwargs)
-        else:
-            return redirect(url_for('login'))
-    return wrap
 
-
-# Logout
-@app.route('/logout')
-@is_logged_in
-def logout():
-    session.clear()
-    return redirect(url_for('login'))
 
 # MSO's
 @app.route('/all_mso')
