@@ -92,7 +92,11 @@
                             <img src="{{ url_for('static', filename='img/img2.jpg') }}">
                         </div>
                         <a href="#user">
-                            <img class="circle" src="{{ url_for('static', filename='img/person1.jpg') }}">
+                            {% if current_user['sex'] == 'M' %}
+                                <img class="circle" src="{{ url_for('static', filename='img/person1.jpg') }}">
+                            {% else %}
+                                <img class="circle" src="{{ url_for('static', filename='img/person2.jpg') }}">
+                            {% endif %}
                         </a>
                         <a href="#name">
                             <span class="white-text name">{{ current_user['first_name'] + ' ' + current_user['last_name'] }}</span>

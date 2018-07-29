@@ -21,7 +21,7 @@ def get_user_by_email(email):
         user='root', password='@tmsqe!1321', host='127.0.0.1', database='MSO')
     cur = cnx.cursor(dictionary=True)
 
-    cur.execute("SELECT id, first_name, last_name, email, register_date, airport_id, job_title, department FROM users WHERE email = %s", [email])
+    cur.execute("SELECT id, first_name, last_name, email, register_date, airport_id, job_title, department, sex, profile_picture FROM users WHERE email = %s", [email])
     r = cur.fetchone()
     cur.close()
     cnx.close()
