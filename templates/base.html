@@ -93,9 +93,9 @@
                         </div>
                         <a href="#user">
                             {% if current_user['sex'] == 'M' %}
-                                <img class="circle" src="{{ url_for('static', filename='img/person1.jpg') }}">
+                                <img class="circle" src="{{ url_for('static', filename='img/male_profile_default.png') }}">
                             {% else %}
-                                <img class="circle" src="{{ url_for('static', filename='img/person2.jpg') }}">
+                                <img class="circle" src="{{ url_for('static', filename='img/female_profile_default.png') }}">
                             {% endif %}
                         </a>
                         <a href="#name">
