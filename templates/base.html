@@ -26,6 +26,9 @@
             <nav class="blue darken-4">
                 <div class="nav-wrapper">
                     <a href="/" class="brand-logo">FIA Logo</a>
+                    <a href="/" data-activates="mobile-demo" class="button-collapse show-on-large">
+                        <i class="material-icons">menu</i>
+                    </a>
                     {% if session.logged_in %}
                     <ul class="right hide-on-med-and-down">
                     	{% if session.logged_in and current_user['department'] == 'OTHER'%}
