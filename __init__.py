@@ -30,6 +30,10 @@ def is_logged_in(f):
             return redirect(url_for('login'))
     return wrap
 
+#A4
+@app.route('/a4')
+def a4():
+    return render_template('a4.html', current_user=current_user())
 
 # Logout
 @app.route('/logout')
