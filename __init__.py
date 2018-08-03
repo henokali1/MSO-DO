@@ -31,9 +31,11 @@ def is_logged_in(f):
     return wrap
 
 #A4
-@app.route('/a4')
-def a4():
-    return render_template('a4.html', current_user=current_user())
+@app.route('/a4/<string:id>/')
+@is_logged_in
+def a4(id):
+    mso_formated = hlp.a4_formatter(id)
+    return render_template('a4.html', current_user=current_user(), msof=mso_formated)
 
 # Logout
 @app.route('/logout')

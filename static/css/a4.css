@@ -1,3 +1,7 @@
+.ws {
+  white-space: PRE;
+}
+
 .tsm-sig {
   position: absolute;
   left: 38%;
