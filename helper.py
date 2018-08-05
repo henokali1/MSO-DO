@@ -2,10 +2,10 @@ import dbconnector as db
 
 element_len = {
 	'id': 72,
-	'req_by': 57,
+	'req_by': 67,
 	'section': 24,
-	'department_head': 27,
-	'location': 23,
+	'department_head': 47,
+	'location': 35,
 	'description_of_service_as': 180
 }
 
