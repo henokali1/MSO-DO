@@ -25,8 +25,26 @@
     <!-- Each sheet element should have the class "sheet" -->
     <!-- "padding-**mm" is optional: you can set 10, 15, 20 or 25 -->
     <section class="sheet padding-10mm">
-        <img class="tsm-sig" src="{{ url_for('static', filename='img/sig.png') }}" width="174px" height="41px">
-        <img class="tss-sig" src="{{ url_for('static', filename='img/sig.png') }}" width="174px" height="41px">
+        <!-- <div class='ws'>
+            <u> asdfsdfafds asdf</u>
+        </div> -->
+        <!-- 
+        <img id="tss-sig" src="sig.png" width="174px" height="41px">
+        
+        <div id="mso-no-t">MSO NO MSO NO</div>
+        <div class="m" id="mso-no">CNS-223</div>
+        <div id="req-date">2018-07-25</div>
+        <div id="req-time">18:21:16</div>
+        <div id="req-by">Police</div>
+        <div id="section">Security</div>
+        <div id="dep-head">Mr. Youssef Balkis</div>
+        <div id="location">Gate #9 B</div>
+        <div id="disc-service-l1">Gate #9B sliding gate u/s.</div>
+        <div id="disc-service-l2">But I must explain to you how all this mistaken idea of denouncing pleasure and.</div>
+        <img id="tsm-sig" src="sig.png" width="174px" height="41px">
+        <div id="tsm-app-date">2018-07-25</div>
+        <div id="act-work-disc-l1">Changed controller board and now it's back to normal.</div>
+        -->
         <div id="one">
             <table class="tg" width="100%">
                 <tr>
@@ -73,66 +91,15 @@
             </div>
         </div>
         <div id="three">
-            <br>
-            <br>
-            <font class="ws" size="3">MSO NO. <u>{{msof.id}}</u>  DATE : <u>{{msof.mso_req_date}}</u>  TIME : <u>{{msof.mso_req_time}}</u> </font>
-            <br>
-            <br>
-            <font class="ws" size="3">REQUESTED BY: <u>{{ msof.requested_by }}</u> SECTION: <u>{{msof.section}}</u></font>
-            <br>
-            <br>
-            <font class="ws" size="3">DEPARTMENT HEAD: <u>{{ msof.department_head }}</u> LOCATION: <u>{{ msof.location }}</u></font>
-            <br>
-            <br>
-            <font class="ws" size="3">DESCRIPTION OF SERVICE: <u>                                                                                  </u></font>
-            <font class="ws" size="3"><u>                                                                                                                                                                </u></font>
-            <font class="ws" size="3"><u>                                                                                                                                                                </u></font>
-            <font class="ws" size="3"><u>                                                                                                                                                                </u></font>
-            <font class="ws" size="3"><u>                                                                                                                                                                </u></font>
-            <font class="ws" size="3"><u>                                                                                                                                                                </u></font>
+
         </div>
         <div id="four"></div>
         <div id="five">
-            APPROVED BY:
-            <br>
-            <br>
-            <br>
-            <font size="3">
-                <div style="float: left">
-                    TECHNICAL SERVICES MANAGER: _________________________________ DATE: __________
-                </div>
-            </font>
+
 
         </div>
         <div id="six"></div>
         <div id="seven">
-            <font size="3">
-                ACTUAL WORK DESCRIPTION: _____________________________________________________
-                <font class="ws" size="3"><u>                                                                                                                                                                </u></font>
-                <font class="ws" size="3"><u>                                                                                                                                                                </u></font>
-                <font class="ws" size="3"><u>                                                                                                                                                                </u></font>
-                <font class="ws" size="3"><u>                                                                                                                                                                </u></font>
-                <font class="ws" size="3"><u>                                                                                                                                                                </u></font>
-            </font>
-            <br>
-            <br>
-            <font size="3">
-                PURCHASE REQUSITION NO.: _______________________________________ DATE:
-                <u>23/23/2018</u>
-
-                <br>
-                <br> DATE STARTED:___________________________ DATE COMPLETED: _____________________
-            </font>
-            <br>
-            <br>
-            <font size="3">WORK COMPLETED BY: _________________________________ ID NO.:___________________</font>
-            <br>
-            <br>
-            <font size="3">TOTAL MAN-HOURS :_____________________________________________________________</font>
-            <br>
-            <br>
-            <br>
-            <font size="3">SUPERVISOR:___________________________________________________ DATE: __________</font>
         </div>
     </section>
 </body>
