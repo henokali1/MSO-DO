@@ -295,7 +295,7 @@ def mso(id):
     if (current_user()['job_title'] in mso_auth) and (current_user()['department'] == 'COMNAV'):
         mso = db.get_mso(id)
 
-        return render_template('mso.html', mso=mso, current_user=current_user())
+        return render_template('mso_pdf.html', mso=mso, current_user=current_user())
     else:
         return render_template('not_authorized.html')
 
